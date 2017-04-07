@@ -1,0 +1,105 @@
+---
+
+####################
+# Install Keycloak
+####################
+
+# Render templates
+
+- name: Generate service
+  template:
+    src: keycloak.service.yaml.j2
+    dest: /tmp/keycloak.service.yaml
+    mode: 0744
+  become: false
+
+- name: Generate secret
+  template:
+    src: keycloak.secret.yaml.j2
+    dest: /tmp/keycloak.secret.yaml
+    mode: 0744
+  become: false
+
+- name: Generate deployment
+  template:
+    src: keycloak.deployment.yaml.j2
+    dest: /tmp/keycloak.deployment.yaml
+    mode: 0744
+  become: false
+
+# Add service
+
+- name: Find out if service already exists
+  command: "kubectl --namespace {{ namespace }} get service dave-authentication -o json"
+  register: get_service
+  ignore_errors: true
+
+- name: Create the service
+  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.service.yaml"
+  when: get_service|failed
+
+- name: Replace the service
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.service.yaml"
+  when: get_service|succeeded
+
+# Add secret
+
+- name: Find out if secret already exists
+  command: "kubectl --namespace {{ namespace }} get secret dave-authentication -o json"
+  register: get_secret
+  ignore_errors: true
+
+- name: Create the secret
+  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.secret.yaml"
+  when: get_secret|failed
+
+- name: Replace the secret
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.secret.yaml"
+  when: get_secret|succeeded
+
+# Add deployment
+
+- name: Find out if deployment already exists
+  command: "kubectl --namespace {{ namespace }} get deployment dave-authentication -o json"
+  register: get_deployment
+  ignore_errors: true
+
+- name: Create the deployment
+  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.deployment.yaml"
+  when: get_deployment|failed
+
+- name: Replace the deployment
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.deployment.yaml"
+  when: get_deployment|succeeded
+
+# Make sure the deployment is running before moving forward
+
+- name: Verify that all pods are ready
+  shell: kubectl --namespace {{ namespace }} get pods | grep "dave-authentication" | grep "Running" | wc -l
+  register: cmd_result
+  until: cmd_result.stdout.find('1') != -1
+  retries: 20
+  delay: 30
+
+# Create Route53 alias
+
+- name: Get the loadbalancer details
+  command: "kubectl --namespace {{ namespace }} get service dave-authentication -o json"
+  register: get_loadbalancer
+
+- set_fact:
+    loadbalancer: "{{ get_loadbalancer.stdout | from_json }}"
+
+- set_fact:
+    loadbalancer_dns_name: "{{ loadbalancer['status']['loadBalancer']['ingress'][0]['hostname'] }}"
+
+- route53:
+    command: create
+    zone: "{{ dns_zone }}"
+    record: "{{ keycloak_dns }}"
+    type: A
+    value: "{{ loadbalancer_dns_name }}"
+    alias: True
+    alias_hosted_zone_id: "{{ elb_hosted_zone }}"
+    alias_evaluate_target_health: False
+    overwrite: True

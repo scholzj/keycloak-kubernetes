@@ -1,0 +1,14 @@
+---
+
+####################
+# Delete the namespace
+####################
+
+- name: Find out if namespace exists
+  command: "kubectl get ns {{ namespace }} -o json"
+  register: get_ns
+  ignore_errors: true
+
+- name: Delete the namespace
+  command: "kubectl delete ns {{ namespace }}"
+  when: get_ns|succeeded

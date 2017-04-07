@@ -1,0 +1,47 @@
+---
+
+##########
+# Kubernetes configuration
+##########
+
+# Namespace into which the application should be deployed
+namespace: authentication
+
+##########
+# Software versions for deployment
+##########
+
+# Release / Which tag should be used in the deployment (Docker image tag, not GitHub tag)
+keycloak_release: 3.0.0.Final
+
+##########
+# Domain names
+##########
+
+# Domain name for the application
+dns_zone: dbg-devops.com
+keycloak_dns: auth.dave.dbg-devops.com
+
+# Hosted zone of loadbalancers created by Kubernetes cluster (should be region dependent)
+elb_hosted_zone: Z32O12XQLNTSW2
+
+##########
+# SSL certificates for external communication
+##########
+
+# Let's Encrypt
+letsencrypt_account_key_path: ./account.key
+acme_directory: https://acme-v01.api.letsencrypt.org/directory # Production
+# acme_directory: https://acme-staging.api.letsencrypt.org/directory # Staging
+
+# External SSL certificates
+key_path: ./keycloak.key
+cert_path: ./keycloak.crt
+
+
+##########
+# Authentication
+##########
+
+admin_user: "schojak"
+admin_password: "jakub138"

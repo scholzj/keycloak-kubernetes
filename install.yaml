@@ -1,0 +1,10 @@
+---
+###########################
+# Install Keycloak
+###########################
+
+- hosts: localhost
+  connection: local
+  roles:
+    - namespace
+    - keycloak

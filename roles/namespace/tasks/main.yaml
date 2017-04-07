@@ -1,0 +1,38 @@
+---
+
+####################
+# Create the namespace
+####################
+
+- name: Find out if namespace already exists
+  command: "kubectl get ns {{ namespace }} -o json"
+  register: get_ns
+  ignore_errors: true
+
+- name: Create the namespace
+  command: "kubectl create ns {{ namespace }}"
+  when: get_ns|failed
+
+# Render templates for resource quotas
+
+- name: Generate resources quota
+  template:
+    src: resourcequota.yaml.j2
+    dest: /tmp/resourcequota.yaml
+    mode: 0744
+  become: false
+
+# Load resource quotas
+
+- name: Find out if quota already exists
+  command: "kubectl --namespace {{ namespace }} get resourcequotas dave-resource-quota -o json"
+  register: get_resourcequota
+  ignore_errors: true
+
+- name: Create the quota
+  command: "kubectl --namespace {{ namespace }} create -f /tmp/resourcequota.yaml"
+  when: get_resourcequota|failed
+
+- name: Replace the quota
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/resourcequota.yaml"
+  when: get_resourcequota|succeeded

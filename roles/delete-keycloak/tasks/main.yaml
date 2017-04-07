@@ -1,0 +1,58 @@
+---
+
+####################
+# Delete Keycloak
+####################
+
+# Delete service
+
+- name: Find out if service already exists
+  command: "kubectl --namespace {{ namespace }} get service dave-authentication -o json"
+  register: get_service
+  ignore_errors: true
+
+- name: Delete the service
+  command: "kubectl --namespace {{ namespace }} delete service dave-authentication"
+  when: get_service|succeeded
+
+# Delete deployment
+
+- name: Find out if deployment already exists
+  command: "kubectl --namespace {{ namespace }} get deployment dave-authentication -o json"
+  register: get_deployment
+  ignore_errors: true
+
+- name: Delete the deployment
+  command: "kubectl --namespace {{ namespace }} delete deployment dave-authentication"
+  when: get_deployment|succeeded
+
+# Delete secret
+
+- name: Find out if secret already exists
+  command: "kubectl --namespace {{ namespace }} get secret dave-authentication -o json"
+  register: get_secret
+  ignore_errors: true
+
+- name: Delete the secret
+  command: "kubectl --namespace {{ namespace }} delete secret dave-authentication"
+  when: get_secret|succeeded
+
+# Delete the Route53 DNS record
+
+- route53:
+      command: get
+      zone: "{{ dns_zone }}"
+      record: "{{ keycloak_dns }}"
+      type: A
+  register: route53
+
+- route53:
+    command: delete
+    zone: "{{ dns_zone }}"
+    record: "{{ keycloak_dns }}"
+    value: "{{ route53.set.value }}"
+    type: A
+    alias: True
+    alias_hosted_zone_id: "{{ route53.set.alias_hosted_zone_id }}"
+    overwrite: True
+  when: route53.set.record is defined
