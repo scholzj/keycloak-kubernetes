@@ -1,0 +1,80 @@
+---
+
+####################
+# Generate new keys CSRs and sign them with Let's Encrypt
+####################
+
+# Generate the account key
+
+- stat:
+    path: "{{ letsencrypt_account_key_path }}"
+  register: letsencrypt_account_key_exists
+
+- name: Generate Let's Encrypt account key
+  command: "openssl genrsa -out {{ letsencrypt_account_key_path }} 2048"
+  when: letsencrypt_account_key_exists.stat.exists == False
+
+# Generate the UI key and CSR
+
+- stat:
+    path: "{{ key_path }}"
+  register: key_exists
+
+- name: Generate new UI key
+  command: "openssl genrsa -out {{ key_path }} 2048"
+  when: key_exists.stat.exists == False
+
+- name: Generate new UI CSR
+  command: "openssl req -out /tmp/keycloak.csr -new -key {{ key_path }} -subj '/CN={{ keycloak_dns }}'"
+
+# - name: Generate new key and CSR for API
+#   command: "openssl req -out /tmp/api.csr -new -newkey rsa:2048 -nodes -keyout {{ api_key_path }} -subj '/CN={{ api_dns }}'"
+
+# Handle the challenge
+
+- name: Get the challange for signing UI certificate
+  letsencrypt:
+    account_key: "{{ letsencrypt_account_key_path }}"
+    csr: /tmp/keycloak.csr
+    dest: "{{ cert_path }}"
+    challenge: dns-01
+    acme_directory: "{{ acme_directory }}"
+  register: challenge
+
+- route53:
+    command: create
+    zone: "{{ dns_zone }}"
+    record: "{{ challenge['challenge_data'][keycloak_dns]['dns-01']['resource'] }}.{{ keycloak_dns }}"
+    type: TXT
+    value: "\"{{ challenge['challenge_data'][keycloak_dns]['dns-01']['resource_value'] }}\""
+    overwrite: True
+  when: challenge.challenge_data is defined
+
+# Wait for 1 minute to get the DNS records propagated
+
+- pause:
+    minutes: 1
+  when: challenge.challenge_data is defined
+
+# Sign the certificates
+
+- name: Sign the UI key
+  letsencrypt:
+    account_key: "{{ letsencrypt_account_key_path }}"
+    csr: /tmp/keycloak.csr
+    dest: "{{ cert_path }}"
+    data: "{{ challenge }}"
+    challenge: dns-01
+    acme_directory: "{{ acme_directory }}"
+  when: challenge.challenge_data is defined
+
+# Delete the ownership verification DNS records
+
+- route53:
+    command: delete
+    zone: "{{ dns_zone }}"
+    record: "{{ challenge['challenge_data'][keycloak_dns]['dns-01']['resource'] }}.{{ keycloak_dns }}"
+    type: TXT
+    value: "\"{{ challenge['challenge_data'][keycloak_dns]['dns-01']['resource_value'] }}\""
+    overwrite: True
+  when: challenge.challenge_data is defined

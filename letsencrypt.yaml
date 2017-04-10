@@ -1,0 +1,9 @@
+---
+###########################
+# Generate new key and CSR and sign it with Let's Encrypt CA
+###########################
+
+- hosts: localhost
+  connection: local
+  roles:
+    - letsencrypt
