@@ -22,7 +22,7 @@ spec:
       #  container.apparmor.seccomp.beta.kubernetes.io/dave-authentication: docker/default
     spec:
       containers:
-        - image: jboss/keycloak:{{ keycloak_release }}
+        - image: bpasson/keycloak-proxy-https:{{ keycloak_release }}
           name: dave-authentication
           imagePullPolicy: Always
           resources:

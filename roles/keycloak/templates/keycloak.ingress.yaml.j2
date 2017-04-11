@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dave-authentication
+  labels:
+    app: dave
+    layer: auth
+    project: dave
+  namespace: {{ namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - auth.dave.dbg-devops.com
+    secretName: dave-authentication
+  rules:
+  - host: auth.dave.dbg-devops.com
+    http:
+      paths:
+      - backend:
+          serviceName: dave-authentication
+          servicePort: 80

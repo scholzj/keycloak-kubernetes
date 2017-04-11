@@ -27,6 +27,13 @@
     mode: 0744
   become: false
 
+- name: Generate ingress
+  template:
+    src: keycloak.ingress.yaml.j2
+    dest: /tmp/keycloak.ingress.yaml
+    mode: 0744
+  become: false
+
 # Add service
 
 - name: Find out if service already exists
@@ -71,6 +78,21 @@
 - name: Replace the deployment
   command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.deployment.yaml"
   when: get_deployment|succeeded
+
+# Add ingress
+
+- name: Find out if ingress already exists
+  command: "kubectl --namespace {{ namespace }} get ingress dave-authentication -o json"
+  register: get_ingress
+  ignore_errors: true
+
+- name: Create the ingress
+  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.ingress.yaml"
+  when: get_ingress|failed
+
+- name: Replace the ingress
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.ingress.yaml"
+  when: get_ingress|succeeded
 
 # Make sure the deployment is running before moving forward
 
