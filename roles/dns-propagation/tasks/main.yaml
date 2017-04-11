@@ -12,7 +12,7 @@
 
 - name: Vertify that Keycloak DNS is propagated
   shell: "nslookup {{ keycloak_dns }}"
-  register: api_lookup
-  until: api_lookup|succeeded
+  register: keycloak_lookup
+  until: keycloak_lookup|succeeded
   retries: 50
   delay: 30
