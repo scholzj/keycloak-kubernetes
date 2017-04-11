@@ -32,6 +32,8 @@ The configuration is in `group_vars/all/vars.yaml`. It configures different deta
 | `elb_hosted_zone` | The hosted zone in which the aliased ELB load balancers are hosted (should be dependent on the AWS region) | `Z32O12XQLNTSW2` |
 | `key_path` | Path to the SSL private key | `./api.key` |
 | `cert_path` | Path to the SSL public key | `./api.cert` |
+| `admin_user` | Admin user for Keycloak service | `admin` |
+| `admin_password` | Admin password for Keycloak service | `123456` |
 
 Following configuration is needed only for signing the certificates with Let's Encrypt:
 
