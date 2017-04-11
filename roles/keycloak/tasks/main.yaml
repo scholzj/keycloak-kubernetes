@@ -106,7 +106,7 @@
 # Create Route53 alias
 
 - name: Get the loadbalancer details
-  command: "kubectl --namespace {{ namespace }} get service dave-authentication -o json"
+  command: "kubectl --namespace {{ namespace }} get ingress dave-authentication -o json"
   register: get_loadbalancer
 
 - set_fact:
