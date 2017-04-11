@@ -1,0 +1,18 @@
+---
+
+####################
+# Wait for DNS propagation
+####################
+
+# This should be ideally done together with the deployment of the individual components
+# But DNS propagation might take lot of waiting. Se we do it at the end of the whole deployment
+# From one role for all components
+
+# Wait for API
+
+- name: Vertify that Keycloak DNS is propagated
+  shell: "nslookup {{ keycloak_dns }}"
+  register: api_lookup
+  until: api_lookup|succeeded
+  retries: 50
+  delay: 30
