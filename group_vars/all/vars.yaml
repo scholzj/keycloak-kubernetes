@@ -43,5 +43,5 @@ cert_path: ./keycloak.crt
 # Authentication
 ##########
 
-admin_user: "schojak"
-admin_password: "jakub138"
+admin_user: "admin"
+admin_password: "xxxxx"
