@@ -4,6 +4,31 @@
 # Install Keycloak
 ####################
 
+# Create full SSL chain for the public key
+
+- name: Download intermediate certificate
+  get_url:
+    url: "{{ full_chain_cert }}"
+    dest: /tmp/full_chain.crt
+    mode: 0744
+  when:
+    - full_chain_cert is defined
+
+- name: Merge cert with chain
+  shell: "cat {{ cert_path }} /tmp/full_chain.crt > /tmp/full_chain.crt"
+  when:
+    - full_chain_cert is defined
+
+- set_fact:
+    full_chain: "/tmp/full_chain.crt"
+  when:
+    - full_chain_cert is defined
+
+- set_fact:
+    full_chain: "{{ cert_path }}"
+  when:
+    - full_chain_cert is not defined
+
 # Render templates
 
 - name: Generate service

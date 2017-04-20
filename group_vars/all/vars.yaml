@@ -30,6 +30,10 @@ elb_hosted_zone: Z32O12XQLNTSW2
 ##########
 
 # Let's Encrypt
+
+# If full chain cert is defined, it will be merged into the public key
+full_chain_cert: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt
+
 letsencrypt_account_key_path: ./account.key
 acme_directory: https://acme-v01.api.letsencrypt.org/directory # Production
 # acme_directory: https://acme-staging.api.letsencrypt.org/directory # Staging

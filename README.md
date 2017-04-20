@@ -41,6 +41,7 @@ Following configuration is needed only for signing the certificates with Let's E
 |--------|-------------|---------|
 | `letsencrypt_account_key_path` | Path where the Let's Encrypt account key is / should be created | `./account.key` |
 | `acme_directory` | Let's Encrypt ACME directory where we the certificates should be signed (production or staging) | `https://acme-staging.api.letsencrypt.org/directory` |
+| `full_chain_cert` | URL to chain of public CA certificates which should be used with the end certificates. If not specified, only the end certificate will be used. | `https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt` |
 
 ## Installation
 
