@@ -1,0 +1,19 @@
+---
+
+####################
+# Install PostgreSQL
+####################
+
+# Render templates
+
+- name: Generate deployment
+  template:
+    src: postgresql.yaml.j2
+    dest: /tmp/postgresql.yaml
+    mode: 0744
+  become: false
+
+# Deploy PostgreSQL
+
+- name: Replace the service
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/postgresql.yaml"

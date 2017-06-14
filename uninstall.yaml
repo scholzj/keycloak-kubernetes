@@ -7,4 +7,5 @@
   connection: local
   roles:
     - delete-keycloak
+    - delete-postgres
     - delete-namespace

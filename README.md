@@ -1,14 +1,6 @@
 # Keycloak
 
-This repository contains the tooling for deploying Keycloak application into running Kubernetes cluster.
-
-*Note: This currently without any persistent storage!*
-
-## TODO:
-
-* README.md
-* SSL
-* Persisitent storage
+This repository contains the tooling for deploying Keycloak application into running Kubernetes cluster. It is using PostgreSQL for persisitence.
 
 ## Prerequisites
 
@@ -34,6 +26,9 @@ The configuration is in `group_vars/all/vars.yaml`. It configures different deta
 | `cert_path` | Path to the SSL public key | `./api.cert` |
 | `admin_user` | Admin user for Keycloak service | `admin` |
 | `admin_password` | Admin password for Keycloak service | `123456` |
+| `postgres_user` | Admin user for Keycloak service | `keycloak` |
+| `postgres_password` | Admin password for Keycloak service | `123456` |
+| `postgres_database` | NAme of the postgreSQL database to use | `keycloak` |
 
 Following configuration is needed only for signing the certificates with Let's Encrypt:
 

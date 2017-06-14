@@ -23,7 +23,7 @@ dns_zone: dbg-devops.com
 keycloak_dns: auth.dave.dbg-devops.com
 
 # Hosted zone of loadbalancers created by Kubernetes cluster (should be region dependent)
-elb_hosted_zone: Z32O12XQLNTSW2
+elb_hosted_zone: Z215JYRZR1TBD5
 
 ##########
 # SSL certificates for external communication
@@ -45,6 +45,12 @@ cert_path: ./keycloak.crt
 ##########
 # Authentication
 ##########
-
 admin_user: "admin"
-admin_password: "secretpassword"
+admin_password: "xxxxx"
+
+##########
+# PostgreSQL
+##########
+postgres_user: "keycloak"
+postgres_password: "xxxxx"
+postgres_database: "keycloak"
