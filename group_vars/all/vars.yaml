@@ -19,11 +19,11 @@ keycloak_release: 3.1.0.Final
 ##########
 
 # Domain name for the application
-dns_zone: dbg-devops.com
-keycloak_dns: auth.dave.dbg-devops.com
+dns_zone: abc.com
+keycloak_dns: auth.abc.com
 
 # Hosted zone of loadbalancers created by Kubernetes cluster (should be region dependent)
-elb_hosted_zone: Z215JYRZR1TBD5
+elb_hosted_zone: ZXXXXXXXXXXXX5
 
 ##########
 # SSL certificates for external communication
