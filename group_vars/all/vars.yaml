@@ -12,7 +12,7 @@ namespace: authentication
 ##########
 
 # Release / Which tag should be used in the deployment (Docker image tag, not GitHub tag)
-keycloak_release: latest
+keycloak_release: 3.1.0.Final
 
 ##########
 # Domain names
@@ -42,10 +42,9 @@ acme_directory: https://acme-v01.api.letsencrypt.org/directory # Production
 key_path: ./keycloak.key
 cert_path: ./keycloak.crt
 
-
 ##########
 # Authentication
 ##########
 
 admin_user: "admin"
-admin_password: "xxxxx"
+admin_password: "secretpassword"

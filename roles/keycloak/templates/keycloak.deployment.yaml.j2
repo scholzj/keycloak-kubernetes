@@ -22,7 +22,7 @@ spec:
       #  container.apparmor.seccomp.beta.kubernetes.io/dave-authentication: docker/default
     spec:
       containers:
-        - image: bpasson/keycloak-proxy-https:{{ keycloak_release }}
+        - image: jboss/keycloak:{{ keycloak_release }}
           name: dave-authentication
           imagePullPolicy: Always
           resources:
@@ -43,6 +43,17 @@ spec:
                 secretKeyRef:
                   name: dave-authentication
                   key: admin_password
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dave-authentication
+                  key: postgres_password
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+            - name: POSTGRES_DATABASE
+              value: "keycloak"
+            - name: POSTGRES_USER
+              value: "keycloak"
           ports:
             - containerPort: 8080
               name: https

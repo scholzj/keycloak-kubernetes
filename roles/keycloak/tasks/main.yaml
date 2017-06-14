@@ -9,13 +9,13 @@
 - name: Download intermediate certificate
   get_url:
     url: "{{ full_chain_cert }}"
-    dest: /tmp/full_chain.crt
+    dest: /tmp/ca_chain.crt
     mode: 0744
   when:
     - full_chain_cert is defined
 
 - name: Merge cert with chain
-  shell: "cat {{ cert_path }} /tmp/full_chain.crt > /tmp/full_chain.crt"
+  shell: "cat {{ cert_path }} /tmp/ca_chain.crt > /tmp/full_chain.crt"
   when:
     - full_chain_cert is defined
 
@@ -130,23 +130,23 @@
 
 # Create Route53 alias
 
-- name: Get the loadbalancer details
-  command: "kubectl --namespace {{ namespace }} get ingress dave-authentication -o json"
-  register: get_loadbalancer
-
-- set_fact:
-    loadbalancer: "{{ get_loadbalancer.stdout | from_json }}"
-
-- set_fact:
-    loadbalancer_dns_name: "{{ loadbalancer['status']['loadBalancer']['ingress'][0]['hostname'] }}"
-
-- route53:
-    command: create
-    zone: "{{ dns_zone }}"
-    record: "{{ keycloak_dns }}"
-    type: A
-    value: "{{ loadbalancer_dns_name }}"
-    alias: True
-    alias_hosted_zone_id: "{{ elb_hosted_zone }}"
-    alias_evaluate_target_health: False
-    overwrite: True
+# - name: Get the loadbalancer details
+#   command: "kubectl --namespace {{ namespace }} get ingress dave-authentication -o json"
+#   register: get_loadbalancer
+#
+# - set_fact:
+#     loadbalancer: "{{ get_loadbalancer.stdout | from_json }}"
+#
+# - set_fact:
+#     loadbalancer_dns_name: "{{ loadbalancer['status']['loadBalancer']['ingress'][0]['hostname'] }}"
+#
+# - route53:
+#     command: create
+#     zone: "{{ dns_zone }}"
+#     record: "{{ keycloak_dns }}"
+#     type: A
+#     value: "{{ loadbalancer_dns_name }}"
+#     alias: True
+#     alias_hosted_zone_id: "{{ elb_hosted_zone }}"
+#     alias_evaluate_target_health: False
+#     overwrite: True
