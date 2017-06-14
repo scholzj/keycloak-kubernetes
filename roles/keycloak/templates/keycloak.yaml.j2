@@ -1,0 +1,142 @@
+# The secrets should be base64 encoded
+apiVersion: v1
+kind: Secret
+metadata:
+  name: keycloak
+  namespace: {{ namespace }}
+  labels:
+    app: keycloak
+    layer: auth
+    project: dave
+data:
+  admin_password: "{{ admin_password | b64encode }}"
+  postgres_password: "{{ postgres_password | b64encode }}"
+  tls.key: {{ lookup('file', key_path) | b64encode }}
+  tls.crt: {{ lookup('file', full_chain) | b64encode }}
+
+---
+# The secrets should be base64 encoded
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak
+  namespace: {{ namespace }}
+  labels:
+    app: keycloak
+    layer: auth
+    project: dave
+data:
+  admin_user: "{{ admin_user }}"
+  postgres_user: "{{ postgres_user }}"
+  postgres_database: "{{ postgres_database }}"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+    layer: auth
+    project: dave
+  namespace: {{ namespace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: keycloak
+      labels:
+        name: keycloak
+        app: keycloak
+        layer: auth
+        project: dave
+      #annotations:
+      #  container.apparmor.security.beta.kubernetes.io/dave-authentication: runtime/default
+      #  container.apparmor.seccomp.beta.kubernetes.io/dave-authentication: docker/default
+    spec:
+      containers:
+        - image: jboss/keycloak-postgres:{{ keycloak_release }}
+          name: keycloak
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          env:
+            - name: KEYCLOAK_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: keycloak
+                  key: admin_user
+            - name: KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak
+                  key: admin_password
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak
+                  key: postgres_password
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: keycloak
+                  key: postgres_database
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: keycloak
+                  key: postgres_user
+          ports:
+            - containerPort: 8080
+              name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+    layer: auth
+    project: dave
+  namespace: {{ namespace }}
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  selector:
+    name: keycloak
+  type: ClusterIP
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+    layer: auth
+    project: dave
+  namespace: {{ namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - {{ keycloak_dns }}
+    secretName: keycloak
+  rules:
+  - host: {{ keycloak_dns }}
+    http:
+      paths:
+      - backend:
+          serviceName: keycloak
+          servicePort: 80

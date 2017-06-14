@@ -9,13 +9,13 @@
 - name: Download intermediate certificate
   get_url:
     url: "{{ full_chain_cert }}"
-    dest: /tmp/full_chain.crt
+    dest: /tmp/ca_chain.crt
     mode: 0744
   when:
     - full_chain_cert is defined
 
 - name: Merge cert with chain
-  shell: "cat {{ cert_path }} /tmp/full_chain.crt > /tmp/full_chain.crt"
+  shell: "cat {{ cert_path }} /tmp/ca_chain.crt > /tmp/full_chain.crt"
   when:
     - full_chain_cert is defined
 
@@ -31,98 +31,20 @@
 
 # Render templates
 
-- name: Generate service
+- name: Generate deplyoment
   template:
-    src: keycloak.service.yaml.j2
-    dest: /tmp/keycloak.service.yaml
+    src: keycloak.yaml.j2
+    dest: /tmp/keycloak.yaml
     mode: 0744
   become: false
 
-- name: Generate secret
-  template:
-    src: keycloak.secret.yaml.j2
-    dest: /tmp/keycloak.secret.yaml
-    mode: 0744
-  become: false
+# Deploy Keycloak
 
-- name: Generate deployment
-  template:
-    src: keycloak.deployment.yaml.j2
-    dest: /tmp/keycloak.deployment.yaml
-    mode: 0744
-  become: false
-
-- name: Generate ingress
-  template:
-    src: keycloak.ingress.yaml.j2
-    dest: /tmp/keycloak.ingress.yaml
-    mode: 0744
-  become: false
-
-# Add service
-
-- name: Find out if service already exists
-  command: "kubectl --namespace {{ namespace }} get service dave-authentication -o json"
-  register: get_service
-  ignore_errors: true
-
-- name: Create the service
-  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.service.yaml"
-  when: get_service|failed
-
-- name: Replace the service
-  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.service.yaml"
-  when: get_service|succeeded
-
-# Add secret
-
-- name: Find out if secret already exists
-  command: "kubectl --namespace {{ namespace }} get secret dave-authentication -o json"
-  register: get_secret
-  ignore_errors: true
-
-- name: Create the secret
-  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.secret.yaml"
-  when: get_secret|failed
-
-- name: Replace the secret
-  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.secret.yaml"
-  when: get_secret|succeeded
-
-# Add deployment
-
-- name: Find out if deployment already exists
-  command: "kubectl --namespace {{ namespace }} get deployment dave-authentication -o json"
-  register: get_deployment
-  ignore_errors: true
-
-- name: Create the deployment
-  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.deployment.yaml"
-  when: get_deployment|failed
-
-- name: Replace the deployment
-  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.deployment.yaml"
-  when: get_deployment|succeeded
-
-# Add ingress
-
-- name: Find out if ingress already exists
-  command: "kubectl --namespace {{ namespace }} get ingress dave-authentication -o json"
-  register: get_ingress
-  ignore_errors: true
-
-- name: Create the ingress
-  command: "kubectl --namespace {{ namespace }} create -f /tmp/keycloak.ingress.yaml"
-  when: get_ingress|failed
-
-- name: Replace the ingress
-  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.ingress.yaml"
-  when: get_ingress|succeeded
-
-# Make sure the deployment is running before moving forward
+- name: Deploy Keycloak
+  command: "kubectl --namespace {{ namespace }} apply -f /tmp/keycloak.yaml"
 
 - name: Verify that all pods are ready
-  shell: kubectl --namespace {{ namespace }} get pods | grep "dave-authentication" | grep "Running" | wc -l
+  shell: kubectl --namespace {{ namespace }} get pods | grep "keycloak" | grep "Running" | wc -l
   register: cmd_result
   until: cmd_result.stdout.find('1') != -1
   retries: 20
@@ -131,7 +53,7 @@
 # Create Route53 alias
 
 - name: Get the loadbalancer details
-  command: "kubectl --namespace {{ namespace }} get ingress dave-authentication -o json"
+  command: "kubectl --namespace {{ namespace }} get ingress keycloak -o json"
   register: get_loadbalancer
 
 - set_fact:

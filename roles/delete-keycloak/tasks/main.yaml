@@ -7,35 +7,57 @@
 # Delete service
 
 - name: Find out if service already exists
-  command: "kubectl --namespace {{ namespace }} get service dave-authentication -o json"
+  command: "kubectl --namespace {{ namespace }} get service keycloak -o json"
   register: get_service
   ignore_errors: true
 
 - name: Delete the service
-  command: "kubectl --namespace {{ namespace }} delete service dave-authentication"
+  command: "kubectl --namespace {{ namespace }} delete service keycloak"
   when: get_service|succeeded
 
 # Delete deployment
 
 - name: Find out if deployment already exists
-  command: "kubectl --namespace {{ namespace }} get deployment dave-authentication -o json"
+  command: "kubectl --namespace {{ namespace }} get deployment keycloak -o json"
   register: get_deployment
   ignore_errors: true
 
 - name: Delete the deployment
-  command: "kubectl --namespace {{ namespace }} delete deployment dave-authentication"
+  command: "kubectl --namespace {{ namespace }} delete deployment keycloak"
   when: get_deployment|succeeded
+
+# Delete configmap
+
+- name: Find out if configmap already exists
+  command: "kubectl --namespace {{ namespace }} get configmap keycloak -o json"
+  register: get_configmap
+  ignore_errors: true
+
+- name: Delete the configmap
+  command: "kubectl --namespace {{ namespace }} delete configmap keycloak"
+  when: get_configmap|succeeded
 
 # Delete secret
 
 - name: Find out if secret already exists
-  command: "kubectl --namespace {{ namespace }} get secret dave-authentication -o json"
+  command: "kubectl --namespace {{ namespace }} get secret keycloak -o json"
   register: get_secret
   ignore_errors: true
 
 - name: Delete the secret
-  command: "kubectl --namespace {{ namespace }} delete secret dave-authentication"
+  command: "kubectl --namespace {{ namespace }} delete secret keycloak"
   when: get_secret|succeeded
+
+# Delete ingress
+
+- name: Find out if ingress already exists
+  command: "kubectl --namespace {{ namespace }} get ingress keycloak -o json"
+  register: get_ingress
+  ignore_errors: true
+
+- name: Delete the ingress
+  command: "kubectl --namespace {{ namespace }} delete ingress keycloak"
+  when: get_ingress|succeeded
 
 # Delete the Route53 DNS record
 

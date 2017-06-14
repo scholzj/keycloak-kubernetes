@@ -1,0 +1,60 @@
+---
+
+####################
+# Delete PostgreSQL
+####################
+
+# Delete service
+
+- name: Find out if service already exists
+  command: "kubectl --namespace {{ namespace }} get service postgres -o json"
+  register: get_service
+  ignore_errors: true
+
+- name: Delete the service
+  command: "kubectl --namespace {{ namespace }} delete service postgres"
+  when: get_service|succeeded
+
+# Delete deployment
+
+- name: Find out if deployment already exists
+  command: "kubectl --namespace {{ namespace }} get deployment postgres -o json"
+  register: get_deployment
+  ignore_errors: true
+
+- name: Delete the deployment
+  command: "kubectl --namespace {{ namespace }} delete deployment postgres"
+  when: get_deployment|succeeded
+
+# Delete secret
+
+- name: Find out if secret already exists
+  command: "kubectl --namespace {{ namespace }} get secret postgres -o json"
+  register: get_secret
+  ignore_errors: true
+
+- name: Delete the secret
+  command: "kubectl --namespace {{ namespace }} delete secret postgres"
+  when: get_secret|succeeded
+
+# Delete configmap
+
+- name: Find out if configmap already exists
+  command: "kubectl --namespace {{ namespace }} get configmap postgres -o json"
+  register: get_configmap
+  ignore_errors: true
+
+- name: Delete the configmap
+  command: "kubectl --namespace {{ namespace }} delete configmap postgres"
+  when: get_configmap|succeeded
+
+# Delete pvc
+
+- name: Find out if pvc already exists
+  command: "kubectl --namespace {{ namespace }} get pvc postgres -o json"
+  register: get_pvc
+  ignore_errors: true
+
+- name: Delete the pvc
+  command: "kubectl --namespace {{ namespace }} delete pvc postgres"
+  when: get_pvc|succeeded
