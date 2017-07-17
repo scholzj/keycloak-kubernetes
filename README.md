@@ -18,7 +18,7 @@ The configuration is in `group_vars/all/vars.yaml`. It configures different deta
 | Variable | Explanation | Example |
 |--------|-------------|---------|
 | `namespace` | Kubernetes namespace where Keycloak should be deployed | `dave` |
-| `keycloak_release` | Which Docker image tag should be used in the deployment of the Keycloak application | `1.0.0` |
+| `keycloak_release` | Which Docker image tag should be used in the deployment of the Keycloak application | `3.2.0.Final` |
 | `dns_zone` | Hosted DNS zone which has to exist in Route53 | `dbg-devops.com` |
 | `keycloak_dns` | Hostname of the UI | `snapshot.dave.dbg-devops.com` |
 | `elb_hosted_zone` | The hosted zone in which the aliased ELB load balancers are hosted (should be dependent on the AWS region) | `Z32O12XQLNTSW2` |
