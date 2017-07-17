@@ -12,7 +12,7 @@ namespace: authentication
 ##########
 
 # Release / Which tag should be used in the deployment (Docker image tag, not GitHub tag)
-keycloak_release: 3.1.0.Final
+keycloak_release: 3.2.0.Final
 
 ##########
 # Domain names
