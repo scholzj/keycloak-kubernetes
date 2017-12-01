@@ -2,9 +2,20 @@
 
 This repository contains the tooling for deploying Keycloak application into running Kubernetes cluster. It is using PostgreSQL for persisitence.
 
+<!-- TOC depthFrom:2 -->
+
+- [Updates](#updates)
+- [Prerequisites](#prerequisites)
+- [Configuration](#configuration)
+- [Installation](#installation)
+- [Uninstallation](#uninstallation)
+- [Signed certificates with Let's Encrypt](#signed-certificates-with-lets-encrypt)
+
+<!-- /TOC -->
+
 ## Updates
 
-*1.12.2017*: Update to Keycloak 3.4.0
+*1.12.2017*: Updated to Keycloak 3.4.0
 
 ## Prerequisites
 
