@@ -2,6 +2,10 @@
 
 This repository contains the tooling for deploying Keycloak application into running Kubernetes cluster. It is using PostgreSQL for persisitence.
 
+## Updates
+
+*1.12.2017*: Update to Keycloak 3.4.0
+
 ## Prerequisites
 
 * Kubernetes cluster with Nginx based ingress controller
@@ -18,7 +22,7 @@ The configuration is in `group_vars/all/vars.yaml`. It configures different deta
 | Variable | Explanation | Example |
 |--------|-------------|---------|
 | `namespace` | Kubernetes namespace where Keycloak should be deployed | `dave` |
-| `keycloak_release` | Which Docker image tag should be used in the deployment of the Keycloak application | `3.2.0.Final` |
+| `keycloak_release` | Which Docker image tag should be used in the deployment of the Keycloak application | `3.4.0.Final` |
 | `dns_zone` | Hosted DNS zone which has to exist in Route53 | `dbg-devops.com` |
 | `keycloak_dns` | Hostname of the UI | `snapshot.dave.dbg-devops.com` |
 | `elb_hosted_zone` | The hosted zone in which the aliased ELB load balancers are hosted (should be dependent on the AWS region) | `Z32O12XQLNTSW2` |
