@@ -15,6 +15,7 @@ This repository contains the tooling for deploying Keycloak application into run
 
 ## Updates
 
+*8.12.2017*: Updated to Keycloak 3.4.1
 *1.12.2017*: Updated to Keycloak 3.4.0
 
 ## Prerequisites
